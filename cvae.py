@@ -30,7 +30,11 @@ class cvae:
         with tf.variable_scope('Inference', reuse=True) as sc:
             z1_test_grey = self.__image_tower(sc, grey_img, is_training, reuse=True)
 
-    def loss(self):
+    def loss(self, target_tensor, op_tensor, mean, std, kl_weight, lossweight, \
+                epsilon=1e-6):
+
+        kl_loss = tf.reduce_sum(0.5 * (tf.square(mean) + tf.square(std) \
+                                - tf.log(tf.maximum(tf.square(std), epsilon)) - 1.0))
 
     def __image_tower(self, scope, input_tensor, bn_is_training, nch=1, reuse=False):
         lf = self.layer_factory
@@ -234,4 +238,8 @@ class cvae:
                 'BN6_std', reuse_vars=reuse)
         return conv_mean_norm, conv_std_norm
 
-    def __decoder_tower(self)
+    def __decoder_tower(self):
+
+    def optimize(self, loss):
+        optimizer = tf.train.GradientDescentOptimizer(self.flags.lr_vae)
+        return optimizer.minimize(loss)

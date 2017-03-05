@@ -6,9 +6,10 @@ if socket.gethostname()=='vision-gpu-1' or socket.gethostname()=='vision-gpu-2':
 	sys.path.insert(0, '/home/nfs/ardeshp2/tensorflow_local/lib/python2.7/site-packages/')
 import tensorflow as tf
 import numpy as np
-from data_loaders.imglab_loader import imglab_loader
-from arch.vae_dcganarch import vae_dcganarch
-from arch.network import network
+import imglab_loader
+import cvae
+import network
+
 flags = tf.flags
 #Directory params
 flags.DEFINE_string("out_dir", "/data/ardeshp2/output/images_vae/", "")
@@ -116,11 +117,11 @@ def main():
 	#Train colorfield VAE
 	graph_vae = tf.Graph()
 	with graph_vae.as_default():
-		model_colorfield = vae_dcganarch(FLAGS, nch=2)
-		dnn = network(model_colorfield, data_loader, 2, FLAGS)
-	      	latent_vars_colorfield, latent_vars_colorfield_musigma_test = \
-			dnn.train_vae(os.path.join(FLAGS.out_dir, 'models_colorfield_vae'), \
-				FLAGS.is_train)
+		model_colorfield = cvae(FLAGS, nch=2)
+		#dnn = network(model_colorfield, data_loader, 2, FLAGS)
+	      	#latent_vars_colorfield, latent_vars_colorfield_musigma_test = \
+		#	dnn.train_vae(os.path.join(FLAGS.out_dir, 'models_colorfield_vae'), \
+		#		FLAGS.is_train)
 	
 	np.save(os.path.join(FLAGS.out_dir, 'lv_vae_colorfield_train.mat'), latent_vars_colorfield)
 	np.save(os.path.join(FLAGS.out_dir, 'lv_vae_colorfield_test.mat'), latent_vars_colorfield_musigma_test)

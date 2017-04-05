@@ -1,0 +1,115 @@
+Tensor("Placeholder_1:0", shape=(32, 76800), dtype=float32)
+Tensor("Inference/Reshape:0", shape=(32, 320, 240, 1), dtype=float32)
+--Conv 1 Layer Details --
+Tensor("Inference/Relu:0", shape=(32, 80, 60, 96), dtype=float32)
+Tensor("Inference/BN_IT_1/cond/Merge:0", shape=(32, 80, 60, 96), dtype=float32)
+Tensor("Inference/LRN:0", shape=(32, 80, 60, 96), dtype=float32)
+Tensor("Inference/MaxPool:0", shape=(32, 40, 30, 96), dtype=float32)
+--End Conv 1 Layer Details --
+
+--Conv 2 Layer Details --
+Tensor("Inference/Relu_1:0", shape=(32, 40, 30, 256), dtype=float32)
+Tensor("Inference/BN_IT_2/cond/Merge:0", shape=(32, 40, 30, 256), dtype=float32)
+Tensor("Inference/LRN_1:0", shape=(32, 40, 30, 256), dtype=float32)
+Tensor("Inference/MaxPool_1:0", shape=(32, 20, 15, 256), dtype=float32)
+--End Conv 2 Layer Details --
+
+--Conv 3 Layer Details --
+Tensor("Inference/Relu_2:0", shape=(32, 20, 15, 384), dtype=float32)
+Tensor("Inference/BN_IT_3/cond/Merge:0", shape=(32, 20, 15, 384), dtype=float32)
+None
+None
+--End Conv 3 Layer Details --
+
+--Conv 4 Layer Details --
+Tensor("Inference/Relu_3:0", shape=(32, 20, 15, 384), dtype=float32)
+Tensor("Inference/BN_IT_4/cond/Merge:0", shape=(32, 20, 15, 384), dtype=float32)
+None
+None
+--End Conv 4 Layer Details --
+
+--Conv 5 Layer Details --
+Tensor("Inference/Relu_4:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_5/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 5 Layer Details --
+
+--Conv 6 Layer Details --
+Tensor("Inference/Relu_5:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_6/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 6 Layer Details --
+
+--Conv 7 Layer Details --
+Tensor("Inference/Relu_6:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_7/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 7 Layer Details --
+
+--Conv 8 Layer Details --
+Tensor("Inference/Relu_7:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_8/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 8 Layer Details --
+
+--Conv 9 Layer Details --
+Tensor("Inference/Relu_8:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_9/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 9 Layer Details --
+
+--Conv 10 Layer Details --
+Tensor("Inference/Relu_9:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_10/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 10 Layer Details --
+
+--Conv 11 Layer Details --
+Tensor("Inference/Relu_10:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_11/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 11 Layer Details --
+
+--Conv 12 Layer Details --
+Tensor("Inference/Relu_11:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_12/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 12 Layer Details --
+
+--Conv 13 Layer Details --
+Tensor("Inference/Relu_12:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_13/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 13 Layer Details --
+
+--Conv 14 Layer Details --
+Tensor("Inference/Relu_13:0", shape=(32, 20, 15, 256), dtype=float32)
+Tensor("Inference/BN_IT_14/cond/Merge:0", shape=(32, 20, 15, 256), dtype=float32)
+None
+None
+--End Conv 14 Layer Details --
+
+--Conv 15 Layer Details --
+Tensor("Inference/Relu_14:0", shape=(32, 20, 15, 8), dtype=float32)
+Tensor("Inference/BN_IT_15/cond/Merge:0", shape=(32, 20, 15, 8), dtype=float32)
+None
+None
+--End Conv 15 Layer Details --
+
+Tensor("Inference/Reshape_1:0", shape=(32, 15, 20, 2), dtype=float32)
+--Conv 1 Layer Details --
+Tensor("Inference/Relu_15:0", shape=(32, 4, 5, 96), dtype=float32)
+Tensor("Inference/BN_ET_1/cond/Merge:0", shape=(32, 4, 5, 96), dtype=float32)
+Tensor("Inference/LRN_2:0", shape=(32, 4, 5, 96), dtype=float32)
+Tensor("Inference/MaxPool_2:0", shape=(32, 2, 3, 96), dtype=float32)
+--End Conv 1 Layer Details --
+

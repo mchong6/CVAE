@@ -27,8 +27,10 @@ class cvae:
                     20, 15, 256])
         is_training = tf.placeholder(tf.bool)
         kl_weight = tf.placeholder(tf.float32)
-
-        return inp_color, inp_grey, inp_latent, is_training, kl_weight
+        lossweights = tf.placeholder(tf.float32, [self.flags.batch_size, \
+                self.nch * self.flags.col_img_height * self.flags.col_img_width])
+        
+        return inp_color, inp_grey, inp_latent, is_training, kl_weight, lossweights
 
 
     def inference(self, inp_color, inp_grey, inp_latent, is_training):
@@ -62,19 +64,21 @@ class cvae:
                 z1_test_std, output_test
 
 
-    def loss(self, target_tensor, op_tensor, mean, std, kl_weight, \
-                epsilon=1e-6):
+    def loss(self, target_tensor, op_tensor, mean, std, kl_weight, lossweights,\
+                epsilon=1e-4):
 
         kl_loss = tf.reduce_sum(0.5 * (tf.square(mean) + tf.square(std) \
                                 - tf.log(tf.maximum(tf.square(std), epsilon)) - 1.0))
         op_tensor = tf.reshape(op_tensor, [self.flags.batch_size, 600])
-        l1_loss = tf.reduce_mean(tf.reduce_sum(tf.abs(op_tensor - target_tensor), 1), 0)
+        #l2_loss = tf.reduce_mean(tf.sqrt(tf.reduce_sum(tf.square(target_tensor-op_tensor), 1)))
+        l1_loss = tf.reduce_mean(tf.reduce_sum(lossweights*tf.abs(op_tensor - target_tensor), 1), 0)
 
         return kl_weight * kl_loss + l1_loss
 
 
     def optimize(self, loss, epsilon=1e-4):
-        optimizer = tf.train.GradientDescentOptimizer(self.flags.lr_vae)
+#        optimizer = tf.train.GradientDescentOptimizer(self.flags.lr_vae)
+        optimizer = tf.train.AdamOptimizer(self.flags.lr_vae, epsilon=epsilon)
         return optimizer.minimize(loss)
 
 
@@ -393,10 +397,10 @@ class cvae:
 
         #changed relu to tanh
         conv5 = tf.tanh(lf.conv2d(conv4_norm, W_DT_conv5, stride=1)+b_DT_conv5)
-        conv5_norm = lf.batch_norm_aiuiuc_wrapper(conv5, bn_is_training, \
-                'BN_DT_5', reuse_vars=reuse)
+        #conv5_norm = lf.batch_norm_aiuiuc_wrapper(conv5, bn_is_training, \
+        #        'BN_DT_5', reuse_vars=reuse)
 
-        print_layer(conv5, conv5_norm, None, None, 5)
+        print_layer(conv5, None, None, None, 5)
 
 #        tf.reshape(conv5, [batchsize, h*w*nch])
         return conv5_norm

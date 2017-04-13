@@ -1,6 +1,7 @@
 import tensorflow as tf
 import os
 import numpy as np
+import cv2
 
 
 class network:
@@ -14,7 +15,7 @@ class network:
 
     def __build_graph(self):
         self.inp_color, self.inp_grey, self.inp_latent, self.is_training, \
-                self.kl_weight = self.model.inputs()
+                self.kl_weight, self.lossweights = self.model.inputs()
 
         #inference graph
         self.mean_train, self.std_train, self.output_train, self.mean_test, \
@@ -24,7 +25,7 @@ class network:
 
         #loss function and gd step for vae
         self.loss = self.model.loss(self.inp_color, self.output_train, \
-                self.mean_train, self.std_train, self.kl_weight)
+                self.mean_train, self.std_train, self.kl_weight, self.lossweights, epsilon=1e-6)
         self.train_step = self.model.optimize(self.loss, epsilon=1e-6)
 
         #standard steps
@@ -48,7 +49,7 @@ class network:
                 epoch_loss = self.run_vae_epoch_train(epoch, sess)
                 epoch_loss = (epoch_loss*1.) / (self.flags.updates_per_epoch)
                 print('[DEBUG] ####### Train CVAE Epoch#%d, Loss %f #######' % (epoch, epoch_loss))
-                self.__save_chkpt(epoch, sess, chkptdir, prefix='model_vae')
+                #self.__save_chkpt(epoch, sess, chkptdir, prefix='model_vae')
 
         else:
             self.__load_chkpt(sess, chkptdir)
@@ -66,11 +67,13 @@ class network:
             kl_weight = delta_kl_weight*(epoch)
             batch_color_low, batch_grey_low, batch_lossweights, batch_grey_high = \
                 self.data_loader.train_next_batch(self.flags.batch_size, self.nch)
-            #do we need latent_feed for train? 
+            #outdir = 'test_%d_.png'%(i)
+            #cv2.imwrite(outdir, self.data_loader.get_decoded_img(batch_grey_high[0,...]))
             feed_dict = {self.inp_color: batch_color_low, self.inp_grey: batch_grey_high, \
                     self.inp_latent: latent_feed, \
                     self.is_training: True, \
-                    self.kl_weight: kl_weight}
+                    self.kl_weight: kl_weight,\
+                    self.lossweights:batch_lossweights}
 
             _, _, loss_value, output = sess.run(\
                    [self.check_nan_op, self.train_step, self.loss,    \

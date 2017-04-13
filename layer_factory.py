@@ -6,7 +6,7 @@ from tensorflow.python.framework import tensor_shape
 class layer_factory:
 	def __init__(self):
 		pass
-	def weight_variable(self, name, shape=None, mean=0., stddev=.001, gain=np.sqrt(2)):
+	def weight_variable(self, name, shape=None, mean=0., stddev=.0001, gain=np.sqrt(2)):
 		if(shape == None):
 			return tf.get_variable(name)
 #		#Adaptive initialize based on variable shape
@@ -16,7 +16,7 @@ class layer_factory:
 #			stddev = (1.0 * gain) / np.sqrt(shape[0])
 		return tf.get_variable(name, shape=shape, initializer=tf.random_normal_initializer(mean=mean, stddev=stddev))
 	
-	def bias_variable(self, name, shape=None, constval=.001):
+	def bias_variable(self, name, shape=None, constval=.0001):
 		if(shape == None):
 			return tf.get_variable(name)
 		return tf.get_variable(name, shape=shape, initializer=tf.constant_initializer(constval))

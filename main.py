@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 import socket
 import sys
 if socket.gethostname()=='vision-gpu-1' or socket.gethostname()=='vision-gpu-2':
@@ -31,8 +31,8 @@ flags.DEFINE_integer("grey_img_height", 320, "grey image height")
 #Network Params
 flags.DEFINE_boolean("is_train", True, "Is training flag") 
 flags.DEFINE_integer("hidden_size", 8, "size of the hidden VAE unit")
-flags.DEFINE_float("lr_vae", 1e-6, "learning rate for vae")
-flags.DEFINE_integer("max_epoch_vae", 10, "max epoch")
+flags.DEFINE_float("lr_vae", 0., "learning rate for vae")
+flags.DEFINE_integer("max_epoch_vae", 50, "max epoch")
 
 
 FLAGS = flags.FLAGS

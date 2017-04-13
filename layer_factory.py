@@ -6,7 +6,7 @@ from tensorflow.python.framework import tensor_shape
 class layer_factory:
 	def __init__(self):
 		pass
-	def weight_variable(self, name, shape=None, mean=0., stddev=.0001, gain=np.sqrt(2)):
+	def weight_variable(self, name, shape=None, mean=0., stddev=.001, gain=np.sqrt(2)):
 		if(shape == None):
 			return tf.get_variable(name)
 #		#Adaptive initialize based on variable shape

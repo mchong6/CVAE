@@ -43,13 +43,11 @@ class cvae:
             z1_train_concat = tf.concat(3, [z1_train_grey, inp_color_2d]) 
             z1_train_mean, z1_train_std = self.__encoder_tower(sc, \
                                             z1_train_concat, is_training, nch=258, reuse=False) 
-            #can i do this?
             z1_train_std = tf.sqrt(tf.exp(z1_train_std))
             epsilon_train = tf.truncated_normal([self.flags.batch_size, 20, 15, 256])
             encoder_sample = z1_train_mean + epsilon_train * z1_train_std
             #combine encoder and image tower output
             z1_sample = tf.mul(z1_train_grey, encoder_sample)
-            # nch here 8 because of z1_sample?
             output_train = self.__decoder_tower(sc, z1_sample, is_training, nch = 256, reuse=False)
 
         #testing
@@ -70,10 +68,16 @@ class cvae:
         kl_loss = tf.reduce_sum(0.5 * (tf.square(mean) + tf.square(std) \
                                 - tf.log(tf.maximum(tf.square(std), epsilon)) - 1.0))
         op_tensor = tf.reshape(op_tensor, [self.flags.batch_size, 600])
-        #l2_loss = tf.reduce_mean(tf.sqrt(tf.reduce_sum(tf.square(target_tensor-op_tensor), 1)))
-        l1_loss = tf.reduce_mean(tf.reduce_sum(lossweights*tf.abs(op_tensor - target_tensor), 1), 0)
-
-        return kl_weight * kl_loss + l1_loss
+        l2_loss = tf.reduce_mean(tf.sqrt(tf.reduce_sum(tf.square(target_tensor-op_tensor), 1)))
+        #l1_loss = tf.reduce_mean(tf.reduce_sum(lossweights*tf.abs(op_tensor - target_tensor), 1), 0)
+        #l1_loss = tf.reduce_mean(tf.reduce_sum(tf.abs(op_tensor - target_tensor), 1), 0)
+        tf.Print(kl_loss, [kl_loss], "KL")
+        tf.Print(l2_loss, [l2_loss], "l2")
+        tf.Print(kl_weight, [kl_weight], "kl_weight")
+        l = kl_weight * kl_loss + l2_loss
+        tf.Print(l, [l], "lossss")
+        return l
+        #return kl_weight * kl_loss + l1_loss
 
 
     def optimize(self, loss, epsilon=1e-4):
@@ -403,7 +407,7 @@ class cvae:
         print_layer(conv5, None, None, None, 5)
 
 #        tf.reshape(conv5, [batchsize, h*w*nch])
-        return conv5_norm
+        return conv5
 
 
 def print_layer(conv1, conv1_norm, conv1_lrn, conv1_pool, count):

@@ -31,7 +31,7 @@ flags.DEFINE_integer("grey_img_height", 320, "grey image height")
 #Network Params
 flags.DEFINE_boolean("is_train", True, "Is training flag") 
 flags.DEFINE_integer("hidden_size", 8, "size of the hidden VAE unit")
-flags.DEFINE_float("lr_vae", 0., "learning rate for vae")
+flags.DEFINE_float("lr_vae", 1e-8, "learning rate for vae")
 flags.DEFINE_integer("max_epoch_vae", 50, "max epoch")
 
 
@@ -60,18 +60,18 @@ def main():
                         ext=FLAGS.ext, \
                         listdir=FLAGS.imglist_dir)
 
-	#Train colorfield VAE
-	graph_cvae = tf.Graph()
-	with graph_cvae.as_default():
-	    model_cvae = cvae(FLAGS, nch=2)
+        #Train colorfield VAE
+        graph_cvae = tf.Graph()
+        with graph_cvae.as_default():
+            model_cvae = cvae(FLAGS, nch=2)
             network_cvae = network(model_cvae, data_loader, 2, FLAGS)
             network_cvae.train_vae(os.path.join(FLAGS.out_dir, 'model_cvae'), \
-				FLAGS.is_train)
+                                FLAGS.is_train)
 
-		#dnn = network(model_colorfield, data_loader, 2, FLAGS)
-	      	#latent_vars_colorfield, latent_vars_colorfield_musigma_test = \
-		#	dnn.train_vae(os.path.join(FLAGS.out_dir, 'models_colorfield_vae'), \
-		#		FLAGS.is_train)
-	
+                #dnn = network(model_colorfield, data_loader, 2, FLAGS)
+                #latent_vars_colorfield, latent_vars_colorfield_musigma_test = \
+                #       dnn.train_vae(os.path.join(FLAGS.out_dir, 'models_colorfield_vae'), \
+                #               FLAGS.is_train)
+        
 if __name__ == "__main__":
-	main()
+        main()

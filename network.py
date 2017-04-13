@@ -25,7 +25,7 @@ class network:
 
         #loss function and gd step for vae
         self.loss = self.model.loss(self.inp_color, self.output_train, \
-                self.mean_train, self.std_train, self.kl_weight, self.lossweights, epsilon=1e-6)
+                self.mean_train, self.std_train, self.kl_weight, self.lossweights, epsilon=1e-4)
         self.train_step = self.model.optimize(self.loss, epsilon=1e-6)
 
         #standard steps
@@ -60,11 +60,13 @@ class network:
     def run_vae_epoch_train(self, epoch, sess):
         epoch_loss = 0.
         self.data_loader.random_reset()
-        delta_kl_weight = (1e-3*1.)/(self.flags.max_epoch_vae*1.)
+        delta_kl_weight = (1e-4*1.)/(self.flags.max_epoch_vae*1.)
 #        latent_feed = np.zeros((self.flags.batch_size, self.flags.hidden_size), dtype='f')
         latent_feed = np.random.normal(loc=0., scale=1., size=(32, 20, 15,256))
         for i in range(self.flags.updates_per_epoch):
+            #first epoch this is 0?
             kl_weight = delta_kl_weight*(epoch)
+            print "KL", kl_weight
             batch_color_low, batch_grey_low, batch_lossweights, batch_grey_high = \
                 self.data_loader.train_next_batch(self.flags.batch_size, self.nch)
             #outdir = 'test_%d_.png'%(i)
@@ -78,7 +80,7 @@ class network:
             _, _, loss_value, output = sess.run(\
                    [self.check_nan_op, self.train_step, self.loss,    \
                    self.output_train], feed_dict)
-            print loss_value
+            print "Loss:", loss_value
             #self.train_writer.add_summary(summary_str, epoch*self.flags.updates_per_epoch+i)
             if(i % self.flags.log_interval == 0):
                 self.data_loader.save_output_with_gt(output, batch_color_low, epoch, i, \

@@ -66,7 +66,6 @@ class network:
         for i in range(self.flags.updates_per_epoch):
             #first epoch this is 0?
             kl_weight = delta_kl_weight*(epoch)
-            print "KL", kl_weight
             batch_color_low, batch_grey_low, batch_lossweights, batch_grey_high = \
                 self.data_loader.train_next_batch(self.flags.batch_size, self.nch)
             #outdir = 'test_%d_.png'%(i)

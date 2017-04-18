@@ -25,7 +25,7 @@ class network:
 
         #loss function and gd step for vae
         self.loss = self.model.loss(self.inp_color, self.output_train, \
-                self.mean_train, self.std_train, self.kl_weight, self.lossweights, epsilon=1e-4)
+                self.mean_train, self.std_train, self.kl_weight, self.lossweights, epsilon=1e-6)
         self.train_step = self.model.optimize(self.loss, epsilon=1e-6)
 
         #standard steps

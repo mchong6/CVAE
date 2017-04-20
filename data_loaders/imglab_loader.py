@@ -151,10 +151,6 @@ class imglab_loader:
         print('[DEBUG] Writing output image: %s' % out_fn_pred)
         
         cv2.imwrite(out_fn_pred, np.concatenate((net_out_img, border_img, gt_out_img), axis=1))
-        #cv2.imwrite(out_fn_pred, net_out_img)
-        #cv2.imwrite(out_fn_gt, gt_out_img)
-        #np.save(out_fn_mat_pred, net_out_mat)
-        #np.save(out_fn_mat_gt, gt_out_mat)
         
     def save_output(self, net_op, batch_size, num_cols=8, net_recon_const=None, enable_gt=0):
         num_rows = np.int_(np.ceil((batch_size*1.)/num_cols))
@@ -176,16 +172,10 @@ class imglab_loader:
                             self.__get_decoded_img(net_op[i, ...].reshape(self.outshape[0],self.outshape[1]))
             else:
                 img_lab[..., 0] = self.__get_decoded_img(net_recon_const[i, ...])
-                #outdir = './test_%d_.png'%(i)
-                #cv2.imwrite(outdir, img_lab[...,0])
-                # net_op is 1d instead of 2d when gt
                 if (not enable_gt):
                     img_lab[..., 1] = self.__get_decoded_img(net_op[i, :self.shape[0], :self.shape[1], 0])
                     img_lab[..., 2] = self.__get_decoded_img(net_op[i, :self.shape[0], :self.shape[1], 1])
 
-                    #temp = cv2.cvtColor(img_lab, cv2.COLOR_LAB2BGR)
-                    #outdir = './test_%d_.png'%(i)
-                    #cv2.imwrite(outdir, temp)
                 else:
                     img_lab[..., 1] = self.__get_decoded_img(net_op[i, :np.prod(self.shape)].reshape(self.shape[0], self.shape[1]))
                     img_lab[..., 2] = self.__get_decoded_img(net_op[i, np.prod(self.shape):].reshape(self.shape[0], self.shape[1]))
@@ -194,8 +184,6 @@ class imglab_loader:
                 out_img_lab[r*self.outshape[0]:(r+1)*self.outshape[0], c*self.outshape[1]:(c+1)*self.outshape[1], ...] = img_lab
                 out_img[r*self.outshape[0]:(r+1)*self.outshape[0], c*self.outshape[1]:(c+1)*self.outshape[1], ...] = img_rgb
             c = c+1
-            #outdir = './test_%d_.png'%(i)
-            #cv2.imwrite(outdir, img_rgb)
         return out_img, out_img_lab
 
     def __get_decoded_img(self, img_enc):

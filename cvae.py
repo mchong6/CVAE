@@ -67,15 +67,18 @@ class cvae:
 
         kl_loss = tf.reduce_sum(0.5 * (tf.square(mean) + tf.square(std) \
                                 - tf.log(tf.maximum(tf.square(std), epsilon)) - 1.0))
+        tf.scalar_summary('KL_Loss', kl_loss)
         op_tensor = tf.reshape(op_tensor, [self.flags.batch_size, 600])
         l2_loss = tf.reduce_mean(tf.sqrt(tf.reduce_sum(lossweights* \
                 tf.square(target_tensor-op_tensor), 1)))
+        tf.scalar_summary('L2', l2_loss)
         #l1_loss = tf.reduce_mean(tf.reduce_sum(lossweights*tf.abs(op_tensor - target_tensor), 1), 0)
         #l1_loss = tf.reduce_mean(tf.reduce_sum(tf.abs(op_tensor - target_tensor), 1), 0)
         #tf.Print(kl_loss, [kl_loss], "KL")
         #tf.Print(l2_loss, [l2_loss], "l2")
         #tf.Print(kl_weight, [kl_weight], "kl_weight")
         l = kl_weight * kl_loss + l2_loss
+        tf.scalar_summary('Total Loss', l)
         #tf.Print(l, [l], "lossss")
         return l
         #return kl_weight * kl_loss + l1_loss

@@ -61,26 +61,25 @@ class network:
         epoch_loss = 0.
         self.data_loader.random_reset()
         delta_kl_weight = (1e-4*1.)/(self.flags.max_epoch_vae*1.)
-#        latent_feed = np.zeros((self.flags.batch_size, self.flags.hidden_size), dtype='f')
         latent_feed = np.random.normal(loc=0., scale=1., size=(32, 20, 15,256))
         for i in range(self.flags.updates_per_epoch):
-            #first epoch this is 0?
             kl_weight = delta_kl_weight*(epoch)
             batch_color_low, batch_grey_low, batch_lossweights, batch_grey_high = \
                 self.data_loader.train_next_batch(self.flags.batch_size, self.nch)
-            #outdir = 'test_%d_.png'%(i)
-            #cv2.imwrite(outdir, self.data_loader.get_decoded_img(batch_grey_high[0,...]))
             feed_dict = {self.inp_color: batch_color_low, self.inp_grey: batch_grey_high, \
                     self.inp_latent: latent_feed, \
                     self.is_training: True, \
                     self.kl_weight: kl_weight,\
                     self.lossweights:batch_lossweights}
 
-            _, _, loss_value, output = sess.run(\
+            _, _, loss_value, output, summary_str = sess.run(\
                    [self.check_nan_op, self.train_step, self.loss,    \
-                   self.output_train], feed_dict)
+                   self.output_train, self.summary_op], feed_dict)
             print "Loss:", loss_value
-            #self.train_writer.add_summary(summary_str, epoch*self.flags.updates_per_epoch+i)
+
+            #save summary every 10 batches
+            if i % 10 == 0:
+                self.train_writer.add_summary(summary_str, epoch*self.flags.updates_per_epoch+i)
             if(i % self.flags.log_interval == 0):
                 self.data_loader.save_output_with_gt(output, batch_color_low, epoch, i, \
                     '%02d_train_vae' % self.nch, self.flags.batch_size, \

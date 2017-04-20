@@ -1,5 +1,6 @@
 import os
 import sys
+import math
 sys.path.insert(0, '/home/mchong6/tensorflow/lib/python2.7/site-packages/')
 
 import tensorflow as tf
@@ -73,7 +74,8 @@ class cvae:
         kl_loss = tf.reduce_sum(0.5 * (tf.square(mean) + tf.square(std) \
                                 - tf.log(tf.maximum(tf.square(std), epsilon)) - 1.0))
         tf.scalar_summary('KL_Loss', kl_loss)
-        op_tensor = tf.reshape(op_tensor, [self.flags.batch_size, 600])
+        op_tensor = tf.reshape(op_tensor, [self.flags.batch_size,  2*self.flags.col_img_height \
+                    * self.flags.col_img_width])
         l2_loss = tf.reduce_mean(tf.sqrt(tf.reduce_sum(lossweights* \
                 tf.square(target_tensor-op_tensor), 1)))
         tf.scalar_summary('L2', l2_loss)
@@ -176,13 +178,10 @@ class cvae:
         conv2_norm = lf.batch_norm_aiuiuc_wrapper(conv2, bn_is_training, \
                 'BN_IT_2', reuse_vars=reuse)
         #conv2_lrn = tf.nn.lrn(conv2_norm, 5, alpha=0.0001,beta=0.75)
-        conv2_lrn = conv2_norm
-        conv2_pool = tf.nn.max_pool(conv2_lrn, ksize=[1,3,3,1], \
-                strides=[1,2,2,1], padding='SAME')
 
-        print_layer(conv2, conv2_norm, conv2_lrn, conv2_pool, 2)
+        print_layer(conv2, conv2_norm, None, None, 2)
 
-        conv3 = tf.nn.relu(lf.conv2d(conv2_pool, W_IT_conv3, stride=1)+b_IT_conv3)
+        conv3 = tf.nn.relu(lf.conv2d(conv2_norm, W_IT_conv3, stride=1)+b_IT_conv3)
         conv3_norm = lf.batch_norm_aiuiuc_wrapper(conv3, bn_is_training, \
                 'BN_IT_3', reuse_vars=reuse)
 
@@ -338,16 +337,17 @@ class cvae:
         conv_mean = lf.conv2d(conv5_norm, W_ET_conv_mean, stride=1)+b_ET_conv_mean
         conv_mean_norm = lf.batch_norm_aiuiuc_wrapper(conv_mean, bn_is_training, \
                 'BN_ET_6_mean', reuse_vars=reuse)
-        conv_mean_avg = tf.nn.avg_pool(conv_mean_norm, ksize=[1,5,4,1], \
-                strides=[1,1,1,1], padding='VALID') 
+        #pool twice thus the division by 4
+        conv_mean_avg = tf.nn.avg_pool(conv_mean_norm, ksize=[1,self.flags.col_img_height/4 \
+                ,math.ceil(self.flags.col_img_width/4.),1], strides=[1,1,1,1], padding='VALID') 
         print_layer(conv_mean_norm, conv_mean_avg, None, None, 6)
 
 
         conv_std = lf.conv2d(conv5_norm, W_ET_conv_std, stride=1)+b_ET_conv_std
         conv_std_norm = lf.batch_norm_aiuiuc_wrapper(conv_std, bn_is_training, \
                 'BN_ET_6_std', reuse_vars=reuse)
-        conv_std_avg = tf.nn.avg_pool(conv_std_norm, ksize=[1,5,4,1], \
-                strides=[1,1,1,1], padding='VALID') 
+        conv_std_avg = tf.nn.avg_pool(conv_std_norm, ksize=[1,self.flags.col_img_height/4 \
+                ,math.ceil(self.flags.col_img_width/4.),1], strides=[1,1,1,1], padding='VALID') 
         print_layer(conv_std_norm, conv_std_avg, None, None, 6)
 
         return conv_mean_avg, conv_std_avg

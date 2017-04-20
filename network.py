@@ -5,7 +5,6 @@ import cv2
 
 
 class network:
-
     def __init__(self, model, data_loader, nch, flags):
         self.model = model
         self.data_loader = data_loader
@@ -61,7 +60,8 @@ class network:
         epoch_loss = 0.
         self.data_loader.random_reset()
         delta_kl_weight = (1e-4*1.)/(self.flags.max_epoch_vae*1.)
-        latent_feed = np.random.normal(loc=0., scale=1., size=(32, 20, 15,256))
+        latent_feed = np.random.normal(loc=0., scale=1., size=(self.flags.batch_size, \
+                self.flags.col_img_height, self.flags.col_img_width,256))
         for i in range(self.flags.updates_per_epoch):
 #            kl_weight = delta_kl_weight*(epoch)
             kl_weight = 0.
@@ -76,7 +76,7 @@ class network:
             _, _, loss_value, output, summary_str = sess.run(\
                    [self.check_nan_op, self.train_step, self.loss,    \
                    self.output_train, self.summary_op], feed_dict)
-#            print "Loss:", loss_value
+            print "Loss:", loss_value
 
             #save summary every 10 batches
             if i % 1 == 0:
@@ -110,7 +110,8 @@ def run_cvae(self, chkptdir, latentvars, num_batches=3, num_repeat=8, num_cluste
                 batch_recon_const_outres_1 = np.tile(batch_recon_const_outres[j, ...], (self.flags.batch_size, 1))
                 
                 latent_feed = np.random.normal(loc=0., scale=1., \
-                    size=(32, 20, 15,256))
+                    size=(self.flags.batchsize, self.flags.col_img_height, \
+                    self.flags.col_img_width,256))
                   #  size=(self.flags.batch_size, self.flags.hidden_size))
                 #latent_feed = latentvars[imgid*self.flags.batch_size:(imgid+1)*self.flags.batch_size, ...] 
                 feed_dict = {self.plhold_img:batch_1, self.plhold_is_training:False, \

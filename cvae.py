@@ -282,8 +282,8 @@ class cvae:
             b_ET_conv3 = lf.bias_variable(name="b_ET_conv3", shape=[384])
             b_ET_conv4 = lf.bias_variable(name="b_ET_conv4", shape=[384])
             b_ET_conv5 = lf.bias_variable(name="b_ET_conv5", shape=[256])
-            b_ET_conv_mean = lf.bias_variable(name="b_ET_conv_mean", shape=[8])
-            b_ET_conv_std = lf.bias_variable(name="b_ET_conv_std", shape=[8])
+            b_ET_conv_mean = lf.bias_variable(name="b_ET_conv_mean", shape=[self.flags.hidden_size])
+            b_ET_conv_std = lf.bias_variable(name="b_ET_conv_std", shape=[self.flags.hidden_size])
         else:
             W_ET_conv1 = lf.weight_variable(name="W_ET_conv1")
             W_ET_conv2 = lf.weight_variable(name="W_ET_conv2")

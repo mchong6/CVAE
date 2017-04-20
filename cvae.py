@@ -24,7 +24,7 @@ class cvae:
         inp_grey = tf.placeholder(tf.float32, [self.flags.batch_size, \
                     self.flags.grey_img_height * self.flags.grey_img_width])
         inp_latent = tf.placeholder(tf.float32, [self.flags.batch_size, \
-                    20, 15, 256])
+                    self.flags.col_img_height, self.flags.col_img_width, 256])
         is_training = tf.placeholder(tf.bool)
         kl_weight = tf.placeholder(tf.float32)
         lossweights = tf.placeholder(tf.float32, [self.flags.batch_size, \
@@ -43,8 +43,13 @@ class cvae:
             z1_train_concat = tf.concat(3, [z1_train_grey, inp_color_2d]) 
             z1_train_mean, z1_train_std = self.__encoder_tower(sc, \
                                             z1_train_concat, is_training, nch=258, reuse=False) 
-            z1_train_std = tf.sqrt(tf.exp(z1_train_std))
-            epsilon_train = tf.truncated_normal([self.flags.batch_size, 20, 15, 256])
+            #tile mean and std to correct dimension for concatenation
+            z1_train_mean = tf.tile(z1_train_mean, [1, self.flags.col_img_height, \
+                            self.flags.col_img_width, 256 / self.flags.hidden_size])
+            z1_train_std = tf.sqrt(tf.exp(tf.tile(z1_train_std, [1, self.flags.col_img_height, \
+                            self.flags.col_img_width, 256 / self.flags.hidden_size])))
+            epsilon_train = tf.truncated_normal([self.flags.batch_size, self.flags.col_img_height, \
+                            self.flags.col_img_width, 256])
             encoder_sample = z1_train_mean + epsilon_train * z1_train_std
             #combine encoder and image tower output
             z1_sample = tf.mul(z1_train_grey, encoder_sample)
@@ -73,6 +78,9 @@ class cvae:
                 tf.square(target_tensor-op_tensor), 1)))
         tf.scalar_summary('L2', l2_loss)
         #l1_loss = tf.reduce_mean(tf.reduce_sum(lossweights*tf.abs(op_tensor - target_tensor), 1), 0)
+        l2_loss_wolossweights = tf.reduce_mean(tf.sqrt(tf.reduce_sum( \
+             tf.square(target_tensor-op_tensor), 1)))
+        tf.scalar_summary('L2_W/O_weights', l2_loss_wolossweights)
         total_loss = kl_weight * kl_loss + l2_loss
         tf.scalar_summary('Total Loss', total_loss)
         return total_loss
@@ -156,7 +164,9 @@ class cvae:
         conv1 = tf.nn.relu(lf.conv2d(input_tensor2d, W_IT_conv1, stride=4)+b_IT_conv1)
         conv1_norm = lf.batch_norm_aiuiuc_wrapper(conv1, bn_is_training, \
             'BN_IT_1', reuse_vars=reuse)
-        conv1_lrn = tf.nn.lrn(conv1_norm, 5, alpha=0.0001,beta=0.75)
+#@aditya: Incorrect, batch norm instead of lrn, not both
+        #conv1_lrn = tf.nn.lrn(conv1_norm, 5, alpha=0.0001,beta=0.75)
+        conv1_lrn = conv1_norm
         conv1_pool = tf.nn.max_pool(conv1_lrn, ksize=[1,3,3,1], \
                 strides=[1,2,2,1], padding='SAME')
 
@@ -165,7 +175,8 @@ class cvae:
         conv2 = tf.nn.relu(lf.conv2d(conv1_pool, W_IT_conv2, stride=1)+b_IT_conv2)
         conv2_norm = lf.batch_norm_aiuiuc_wrapper(conv2, bn_is_training, \
                 'BN_IT_2', reuse_vars=reuse)
-        conv2_lrn = tf.nn.lrn(conv2_norm, 5, alpha=0.0001,beta=0.75)
+        #conv2_lrn = tf.nn.lrn(conv2_norm, 5, alpha=0.0001,beta=0.75)
+        conv2_lrn = conv2_norm
         conv2_pool = tf.nn.max_pool(conv2_lrn, ksize=[1,3,3,1], \
                 strides=[1,2,2,1], padding='SAME')
 
@@ -293,7 +304,8 @@ class cvae:
         conv1 = tf.nn.relu(lf.conv2d(input_tensor2d, W_ET_conv1, stride=1)+b_ET_conv1)
         conv1_norm = lf.batch_norm_aiuiuc_wrapper(conv1, bn_is_training, \
                 'BN_ET_1', reuse_vars=reuse)
-        conv1_lrn = tf.nn.lrn(conv1_norm, 5, alpha=0.0001,beta=0.75)
+        #conv1_lrn = tf.nn.lrn(conv1_norm, 5, alpha=0.0001,beta=0.75)
+        conv1_lrn = conv1_norm
         conv1_pool = tf.nn.max_pool(conv1_lrn, ksize=[1,3,3,1], \
                 strides=[1,2,2,1], padding='SAME')
         print_layer(conv1, conv1_norm, conv1_lrn, conv1_pool, 1)
@@ -301,7 +313,8 @@ class cvae:
         conv2 = tf.nn.relu(lf.conv2d(conv1_pool, W_ET_conv2, stride=1)+b_ET_conv2)
         conv2_norm = lf.batch_norm_aiuiuc_wrapper(conv2, bn_is_training, \
                 'BN_ET_2', reuse_vars=reuse)
-        conv2_lrn = tf.nn.lrn(conv2_norm, 5, alpha=0.0001,beta=0.75)
+        #conv2_lrn = tf.nn.lrn(conv2_norm, 5, alpha=0.0001,beta=0.75)
+        conv2_lrn = conv2_norm
         conv2_pool = tf.nn.max_pool(conv2_lrn, ksize=[1,3,3,1], \
                 strides=[1,2,2,1], padding='SAME')
         print_layer(conv2, conv2_norm, conv2_lrn, conv2_pool, 2)
@@ -327,8 +340,7 @@ class cvae:
                 'BN_ET_6_mean', reuse_vars=reuse)
         conv_mean_avg = tf.nn.avg_pool(conv_mean_norm, ksize=[1,5,4,1], \
                 strides=[1,1,1,1], padding='VALID') 
-        mean_tiling = tf.tile(conv_mean_avg, [1, 20, 15, 32])
-        print_layer(conv_mean_norm, conv_mean_avg, mean_tiling, None, 6)
+        print_layer(conv_mean_norm, conv_mean_avg, None, None, 6)
 
 
         conv_std = lf.conv2d(conv5_norm, W_ET_conv_std, stride=1)+b_ET_conv_std
@@ -336,10 +348,9 @@ class cvae:
                 'BN_ET_6_std', reuse_vars=reuse)
         conv_std_avg = tf.nn.avg_pool(conv_std_norm, ksize=[1,5,4,1], \
                 strides=[1,1,1,1], padding='VALID') 
-        std_tiling = tf.tile(conv_std_avg, [1, 20, 15, 32])
-        print_layer(conv_std_norm, conv_std_avg, std_tiling, None, 6)
+        print_layer(conv_std_norm, conv_std_avg, None, None, 6)
 
-        return mean_tiling, std_tiling
+        return conv_mean_avg, conv_std_avg
 
     def __decoder_tower(self, scope, input_tensor, bn_is_training, nch, reuse=False):
         lf = self.layer_factory

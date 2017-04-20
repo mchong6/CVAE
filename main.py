@@ -9,6 +9,7 @@ else:
 import tensorflow as tf
 import numpy as np
 from data_loaders.imglab_loader import imglab_loader
+#from cvae import cvae
 from cvae import cvae
 from network import network
 
@@ -55,6 +56,8 @@ def main():
 
         data_loader = imglab_loader(FLAGS.in_dir, \
                         os.path.join(FLAGS.out_dir, 'images_vae'), \
+                        shape=(FLAGS.col_img_height, FLAGS.col_img_width), \
+                        outshape=(FLAGS.grey_img_height, FLAGS.grey_img_width), \
                         subdir=FLAGS.sub_dir, \
                         countbins_fn=FLAGS.countbins_fn, \
                         ext=FLAGS.ext, \

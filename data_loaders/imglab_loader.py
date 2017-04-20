@@ -5,8 +5,8 @@ import numpy as np
 #import matplotlib.pyplot as plt
 
 class imglab_loader:
-    def __init__(self, data_directory, out_directory, shape=(20, 15), subdir=False, \
-            countbins_fn=None, ext='JPEG', listdir=None, outshape=(320, 240)):
+    def __init__(self, data_directory, out_directory, shape, outshape, \
+            subdir=False, countbins_fn=None, ext='JPEG', listdir=None):
         if(listdir == None):
             if(subdir==False):
                 self.img_fns = glob.glob('%s/*.%s' % (data_directory, ext))
@@ -133,7 +133,7 @@ class imglab_loader:
     
     def save_output_with_gt(self, net_op, gt, epoch, itr_id, prefix, batch_size, num_cols=8, net_recon_const=None):
         #reshape because cv2.resize messes this
-        net_recon_const = net_recon_const.reshape([batch_size, 320, 240])
+        net_recon_const = net_recon_const.reshape([batch_size, self.outshape[0], self.outshape[1]])
         net_out_img, net_out_mat = self.save_output(net_op, batch_size, num_cols=num_cols, net_recon_const=net_recon_const, enable_gt=0)
         gt_out_img, gt_out_mat = self.save_output(gt, batch_size, num_cols=num_cols, net_recon_const=net_recon_const, enable_gt=1)
 

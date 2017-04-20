@@ -63,7 +63,8 @@ class network:
         delta_kl_weight = (1e-4*1.)/(self.flags.max_epoch_vae*1.)
         latent_feed = np.random.normal(loc=0., scale=1., size=(32, 20, 15,256))
         for i in range(self.flags.updates_per_epoch):
-            kl_weight = delta_kl_weight*(epoch)
+#            kl_weight = delta_kl_weight*(epoch)
+            kl_weight = 0.
             batch_color_low, batch_grey_low, batch_lossweights, batch_grey_high = \
                 self.data_loader.train_next_batch(self.flags.batch_size, self.nch)
             feed_dict = {self.inp_color: batch_color_low, self.inp_grey: batch_grey_high, \
@@ -75,10 +76,10 @@ class network:
             _, _, loss_value, output, summary_str = sess.run(\
                    [self.check_nan_op, self.train_step, self.loss,    \
                    self.output_train, self.summary_op], feed_dict)
-            print "Loss:", loss_value
+#            print "Loss:", loss_value
 
             #save summary every 10 batches
-            if i % 10 == 0:
+            if i % 1 == 0:
                 self.train_writer.add_summary(summary_str, epoch*self.flags.updates_per_epoch+i)
             if(i % self.flags.log_interval == 0):
                 self.data_loader.save_output_with_gt(output, batch_color_low, epoch, i, \

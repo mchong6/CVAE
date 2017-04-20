@@ -274,8 +274,8 @@ class cvae:
             W_ET_conv3 = lf.weight_variable(name="W_ET_conv3", shape=[3, 3, 256, 384])
             W_ET_conv4 = lf.weight_variable(name="W_ET_conv4", shape=[3, 3, 384, 384])
             W_ET_conv5 = lf.weight_variable(name="W_ET_conv5", shape=[3, 3, 384, 256])
-            W_ET_conv_mean = lf.weight_variable(name="W_ET_conv_mean", shape=[1, 1, 256, 8])
-            W_ET_conv_std = lf.weight_variable(name="W_ET_conv_std", shape=[1, 1, 256, 8])
+            W_ET_conv_mean = lf.weight_variable(name="W_ET_conv_mean", shape=[1, 1, 256, self.flags.hidden_size])
+            W_ET_conv_std = lf.weight_variable(name="W_ET_conv_std", shape=[1, 1, 256, self.flags.hidden_size])
             
             b_ET_conv1 = lf.bias_variable(name="b_ET_conv1", shape=[96])
             b_ET_conv2 = lf.bias_variable(name="b_ET_conv2", shape=[256])

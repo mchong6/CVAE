@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="2"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 import socket
 import sys
 if socket.gethostname()=='vision-gpu-1' or socket.gethostname()=='vision-gpu-2':

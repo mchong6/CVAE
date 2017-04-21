@@ -24,14 +24,14 @@ flags.DEFINE_string("list_dir", "", "")
 flags.DEFINE_integer("batch_size", 32, "batch size")
 flags.DEFINE_integer("updates_per_epoch", 1, "number of updates per epoch")
 flags.DEFINE_integer("log_interval", 1, "input image height")
-flags.DEFINE_integer("col_img_width", 30, "input image width")
-flags.DEFINE_integer("col_img_height", 40, "input image height")
+flags.DEFINE_integer("col_img_width", 15, "input image width")
+flags.DEFINE_integer("col_img_height", 20, "input image height")
 flags.DEFINE_integer("grey_img_width", 240, "grey image width")
 flags.DEFINE_integer("grey_img_height", 320, "grey image height")
 
 #Network Params
 flags.DEFINE_boolean("is_train", True, "Is training flag") 
-flags.DEFINE_integer("hidden_size", 64, "size of the hidden VAE unit")
+flags.DEFINE_integer("hidden_size", 8, "size of the hidden VAE unit")
 flags.DEFINE_float("lr_vae", 1e-4, "learning rate for vae")
 flags.DEFINE_integer("max_epoch_vae", 50, "max epoch")
 
